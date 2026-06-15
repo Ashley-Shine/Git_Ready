@@ -1,27 +1,11 @@
-import requests
-import os
-from dotenv import load_dotenv
+import sys
+sys.path.append(".")
 
-load_dotenv()
+from backend.job_pipeline import fetch_job_postings
 
-APP_ID = os.getenv("ADZUNA_APP_ID")
-APP_KEY = os.getenv("ADZUNA_APP_KEY")
+# Test with one role
+skills = fetch_job_postings("frontend developer")
 
-def test_adzuna(role: str):
-    url = "https://api.adzuna.com/v1/api/jobs/in/search/1"
-    params = {
-        "app_id": APP_ID,
-        "app_key": APP_KEY,
-        "what": role,
-        "results_per_page": 10,
-        "content-type": "application/json"
-    }
-    response = requests.get(url, params=params)
-    data = response.json()
-    
-    print(f"Status: {response.status_code}")
-    print(f"Total results: {data.get('count', 0)}")
-    print(f"First job title: {data['results'][0]['title']}")
-    print(f"Description snippet: {data['results'][0]['description'][:200]}")
-
-test_adzuna("frontend developer")
+print("\n--- RESULT ---")
+print(f"Total skill mentions: {len(skills)}")
+print(f"Unique skills: {list(set(skills))}")
