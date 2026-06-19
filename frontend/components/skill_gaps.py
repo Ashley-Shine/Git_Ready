@@ -5,5 +5,5 @@ def show_skill_gaps(skill_gaps):
     if not skill_gaps:
         st.info("No gaps detected.")
         return
-    for skill, importance in skill_gaps.items():
-        st.write(f"- **{skill}** (importance: {importance})")
+    for gap in skill_gaps:
+        st.write(f"- **{gap['skill']}** (importance: {gap['importance']})")
