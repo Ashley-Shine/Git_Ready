@@ -45,6 +45,7 @@
   </header>
 
   <iframe id="appframe" class="frame"></iframe>
+<!-- org script aftere deploying on streamlit cloud below
 
   <script>
     // Local Streamlit URL (dev) and fallback (deployed)
@@ -65,6 +66,16 @@
         openLink.href = fallbackUrl;
       }
     }, 2000);
-  </script>
+  </script>  -->
+  <script>
+  // Always load local Streamlit during development
+  const localUrl = `${location.protocol}//${location.hostname}:8501/`;
+  const iframe = document.getElementById("appframe");
+  const openLink = document.getElementById("open-link");
+
+  iframe.src = localUrl;
+  openLink.href = localUrl;
+</script>
+
 </body>
 </html>
