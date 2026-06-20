@@ -6,7 +6,7 @@ import altair as alt
 import pandas as pd
 
 def show_dashboard(result):
-    st.title("GitReady Dashboard")
+    st.title("GitReady Analysis Report")
 
     # Handle empty result
     if not result:
@@ -17,8 +17,18 @@ def show_dashboard(result):
     st.subheader("Profile Summary")
     cols = st.columns(3)
     cols[0].metric("Skill Match %", result.get("score", "-"))
-    cols[1].metric("Quality Score", result.get("quality_score", "-"))
-    cols[2].metric("Final Score", result.get("final_score", "-"))
+
+    # Round Quality Score to 2 decimal places if numeric
+    quality_score = result.get("quality_score", "-")
+    if isinstance(quality_score, (int, float)):
+        quality_score = round(quality_score, 2)
+    cols[1].metric("Quality Score", quality_score)
+
+    # Round Final Score to 2 decimal places if numeric
+    final_score = result.get("final_score", "-")
+    if isinstance(final_score, (int, float)):
+        final_score = round(final_score, 2)
+    cols[2].metric("Final Score", final_score)
 
     # 🔹 Optional comparison chart
     st.subheader("Skill Match vs. Quality Score")
@@ -26,8 +36,8 @@ def show_dashboard(result):
         "Metric": ["Skill Match", "Quality Score", "Final Score"],
         "Score": [
             result.get("score", 0),
-            result.get("quality_score", 0),
-            result.get("final_score", 0)
+            round(result.get("quality_score", 0), 2),
+            round(result.get("final_score", 0), 2)
         ]
     })
     chart = alt.Chart(chart_data).mark_bar().encode(
@@ -39,7 +49,7 @@ def show_dashboard(result):
 
     # 🔹 Repository insights
     st.subheader("Repository Insights")
-    show_repo_language_chart(result.get("top_repos"))
+    show_repo_language_chart(result.get("repos"))
 
     # 🔹 Skill gaps
     st.subheader("Skill Gaps")

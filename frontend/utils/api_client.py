@@ -1,8 +1,7 @@
 import requests
 import streamlit as st
 
-BACKEND_URL = "https://your-backend-url.onrender.com"
-
+BACKEND_URL = "http://localhost:8000"
 def analyze_profile(username: str, role: str):
     try:
         response = requests.get(f"{BACKEND_URL}/analyze", params={"username": username, "role": role})
