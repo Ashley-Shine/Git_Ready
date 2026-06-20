@@ -26,7 +26,10 @@ def extract_skills(cleaned_repos: list, taxonomy: dict) -> dict:
     user_skills = list(set(user_skills))  # deduplicate
 
     if not user_skills:
-        return {"matched": [], "missing": role_skills}
+        return {
+            "matched": [],
+            "missing": [{"skill": s, "importance": w} for s, w in zip(role_skills, role_weights)]
+        }
 
     # embed user skills and search
     user_embeddings = model.encode(user_skills)
@@ -71,3 +74,9 @@ if __name__ == "__main__":
     print("\nMissing skills:")
     for s in result["missing"]:
         print(f"  {s['skill']} (importance: {s['importance']})")
+
+    # Test the empty case specifically
+    print("\n--- Testing empty tech_stack case ---")
+    empty_repo = {"tech_stack": []}
+    empty_result = extract_skills([empty_repo], SAMPLE_TAXONOMY)
+    print("Missing (should be list of dicts):", empty_result["missing"])
