@@ -152,3 +152,21 @@ def get_contributor_count(username: str, repo_name: str) -> int:
     if isinstance(contributors, list):
         return len(contributors)
     return 0
+
+def get_last_push_date(username: str) -> str:
+    try:
+        url = f"https://api.github.com/users/{username}/repos"
+        response = requests.get(url, headers=HEADERS, params={"per_page": 100, "sort": "pushed"})
+        if response.status_code != 200:
+            return None
+        repos = response.json()
+        if not repos or not isinstance(repos, list) or len(repos) == 0:
+            return None
+        for repo in repos:
+            pushed_at = repo.get("pushed_at")
+            if pushed_at:
+                return pushed_at
+        return None
+    except Exception as e:
+        print(f"Error getting last push: {e}")
+        return None
