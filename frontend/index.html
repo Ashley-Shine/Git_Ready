@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>GitReady Frontend</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #fafafa;
+    }
+    header {
+      padding: 12px;
+      text-align: center;
+      background: #f0f0f0;
+      border-bottom: 1px solid #ddd;
+    }
+    header strong {
+      font-size: 1.1em;
+    }
+    .frame {
+      width: 100%;
+      height: calc(100vh - 50px);
+      border: none;
+    }
+    .links {
+      margin-top: 6px;
+    }
+    .links a {
+      margin: 0 8px;
+      text-decoration: none;
+      color: #007acc;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>GitReady Streamlit Frontend</strong><br>
+    <span>Loading Streamlit app…</span>
+    <div class="links">
+      <a id="open-link" href="#" target="_blank">Open in new tab</a>
+    </div>
+  </header>
+
+  <iframe id="appframe" class="frame"></iframe>
+<!-- org script aftere deploying on streamlit cloud below
+
+  <script>
+    // Local Streamlit URL (dev) and fallback (deployed)
+    const localUrl = `${location.protocol}//${location.hostname}:8501/`;
+    const fallbackUrl = "https://your-streamlit-app.streamlit.app/"; // replace with deployed URL
+
+    const iframe = document.getElementById("appframe");
+    const openLink = document.getElementById("open-link");
+
+    // Try local first
+    iframe.src = localUrl;
+    openLink.href = localUrl;
+
+    // If local fails, switch to deployed
+    setTimeout(() => {
+      if (iframe.src === localUrl) {
+        iframe.src = fallbackUrl;
+        openLink.href = fallbackUrl;
+      }
+    }, 2000);
+  </script>  -->
+  <script>
+  // Always load local Streamlit during development
+  const localUrl = `${location.protocol}//${location.hostname}:8501/`;
+  const iframe = document.getElementById("appframe");
+  const openLink = document.getElementById("open-link");
+
+  iframe.src = localUrl;
+  openLink.href = localUrl;
+</script>
+
+</body>
+</html>

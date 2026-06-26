@@ -49,6 +49,9 @@ def cluster_skills(skills: list, embeddings: np.ndarray, n_clusters: int = 15) -
 
 
 def build_taxonomy_with_embeddings(role: str, raw_skills: list) -> dict:
+    
+    role = role.lower()  # add this as first line
+    # rest of the function stays the same
     """
     Main function — takes raw skill mentions and builds a clean taxonomy.
     Saves result to Supabase and returns the taxonomy dict.
@@ -137,12 +140,9 @@ def save_taxonomy_to_supabase(taxonomy: dict):
 
 
 def get_taxonomy_from_supabase(role: str) -> dict:
-    """
-    Fetches existing taxonomy from Supabase for a role.
-    Person 2 will call this function to get the taxonomy.
-    """
     try:
-        result = supabase.table("taxonomy").select("*").eq("role", role).execute()
+        role_lower = role.lower().strip()  # always lowercase
+        result = supabase.table("taxonomy").select("*").eq("role", role_lower).execute()
         if result.data:
             return result.data[0]
         else:
@@ -151,3 +151,19 @@ def get_taxonomy_from_supabase(role: str) -> dict:
     except Exception as e:
         print(f"Supabase error: {e}")
         return {}
+def refresh_taxonomy(role: str) -> dict:
+    """
+    Forces a fresh fetch from Adzuna and rebuilds the taxonomy.
+    """
+    from backend.job_pipeline import fetch_job_postings
+    
+    role = role.lower().strip()
+    print(f"Refreshing taxonomy for '{role}' from live Adzuna data...")
+    
+    raw_skills = fetch_job_postings(role)
+    
+    if not raw_skills:
+        print(f"No skills found for role: {role}")
+        return {}
+    
+    return build_taxonomy_with_embeddings(role, raw_skills)
