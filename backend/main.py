@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 from backend.github_service import get_cleaned_profile, get_last_push_date
-from backend.analytics import log_analysis, get_trending_gaps, get_average_score
+from backend.analytics import log_analysis
 from backend.skill_extractor import extract_skills
 from backend.gap_analyzer import analyze_gaps
 from backend.action_plan import generate_action_plan
@@ -8,6 +8,7 @@ from backend.skills_taxonomy import get_taxonomy_from_supabase, build_taxonomy_w
 from backend.quality_scorer import score_repo_quality, calculate_final_score
 from backend.cache import get_cached_profile, save_cached_profile
 from backend.job_pipeline import fetch_job_postings
+from backend.analytics import get_trending_gaps, get_average_score
 
 app = FastAPI(title="GitReady API", description="GitHub profile analyzer")
 
@@ -41,6 +42,8 @@ def analyze(username: str = Query(..., description="GitHub username"), role: str
 
     skill_result = extract_skills(profile_data, taxonomy_data)
     print("SKILL RESULT:", skill_result)
+    print("MISSING TYPE:", type(skill_result.get("missing", [])))
+    print("MISSING CONTENT:", skill_result.get("missing", []))
     
     gap_result = analyze_gaps(skill_result, taxonomy_data)
 
@@ -52,31 +55,27 @@ def analyze(username: str = Query(..., description="GitHub username"), role: str
     for repo in profile_data:
         total_quality += score_repo_quality(repo)
     quality_score = total_quality / len(profile_data) if profile_data else 0
-    
-    final_score = calculate_final_score(skill_score, quality_score)
-
+    skill_score = gap_result.get("weighted_score", 75.0)
     print(f"DEBUG skill_score: {skill_score}")
     print(f"DEBUG quality_score: {quality_score}")
     print(f"DEBUG final_score: {final_score}")
-
+    print(f"DEBUG gap_result: {gap_result}")
     action_plan = generate_action_plan(role_lower, final_score, matched, missing)
 
     log_analysis(username, role_lower, final_score, missing)
-    
     analytics_data = {
         "trending_gaps": get_trending_gaps(role_lower),
         "average_score": get_average_score(role_lower)
     }
+    job_data = fetch_job_postings(role_lower) if role_lower else []
 
-    # Use taxonomy skills instead of calling Adzuna again
-    job_data = list(taxonomy_data.get("skills", {}).keys()) if taxonomy_data else []
-
+    taxonomy_data = get_taxonomy_from_supabase(role_lower)
     result = {
         "username": username,
         "role": role_lower,
         "total_repos": len(profile_data),
         "score": final_score,
-        "final_score": final_score,
+        "final_score":final_score,
         "skill_score": skill_score,
         "skill_match_pct": skill_score,
         "quality_score": quality_score,
@@ -89,7 +88,7 @@ def analyze(username: str = Query(..., description="GitHub username"), role: str
             {
                 **repo,
                 "language": ", ".join(repo.get("tech_stack", [])) if repo.get("tech_stack") else None,
-                "quality_score": score_repo_quality(repo)
+                "quality_score": score_repo_quality(repo) 
             }
             for repo in profile_data
         ],
