@@ -37,13 +37,11 @@ def get_trending_gaps(role: str, days: int = 7) -> list:
     across all analysis runs in the last N days.
     """
     try:
-        # Calculate the cutoff date
         cutoff_date = (datetime.utcnow() - timedelta(days=days)).isoformat()
 
-        # Fetch all logs for this role within the time window
         result = supabase.table("analytics_log") \
             .select("skill_gaps") \
-            .eq("role", role) \
+            .eq("role", role.lower().strip()) \
             .gte("created_at", cutoff_date) \
             .execute()
 
@@ -51,20 +49,24 @@ def get_trending_gaps(role: str, days: int = 7) -> list:
             print(f"No analytics data found for role: {role}")
             return []
 
-        # Combine all skill_gaps lists into one big list
         all_gaps = []
         for row in result.data:
             gaps = row.get("skill_gaps", [])
-            if gaps:
-                all_gaps.extend(gaps)
+            if not gaps:
+                continue
+            for gap in gaps:
+                # Handle both dict format and plain string format
+                if isinstance(gap, dict):
+                    skill_name = gap.get("skill", "")
+                    if skill_name:
+                        all_gaps.append(skill_name)
+                elif isinstance(gap, str):
+                    all_gaps.append(gap)
 
         if not all_gaps:
             return []
 
-        # Count frequency of each missing skill
         gap_counts = Counter(all_gaps)
-
-        # Sort by most common first
         trending = [skill for skill, count in gap_counts.most_common(10)]
 
         print(f"Trending gaps for '{role}': {trending}")
@@ -73,8 +75,6 @@ def get_trending_gaps(role: str, days: int = 7) -> list:
     except Exception as e:
         print(f"Error fetching trending gaps: {e}")
         return []
-
-
 def get_average_score(role: str) -> float:
     """
     Bonus function - returns average score for a role across all runs.
