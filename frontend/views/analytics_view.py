@@ -1,7 +1,7 @@
 import streamlit as st
 
 def show_analytics_view(result,role):
-    st.title("Analytics Dashboard")
+    st.title("Analytics Results")
 
     if not result:
         st.info("Enter a username and role in the sidebar and click Analyze first.")
