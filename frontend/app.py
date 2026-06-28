@@ -2,9 +2,9 @@ import streamlit as st
 from components.sidebar import show_sidebar
 from utils.api_client import analyze_profile
 from views.dashboard import show_dashboard
-#from views.analytics_view import show_analytics_view
-#from views.job_pipeline_view import show_job_pipeline_view
-#from views.skills_taxonomy_view import show_skills_taxonomy_view
+from views.analytics_view import show_analytics_view
+from views.job_pipeline_view import show_job_pipeline_view
+from views.skills_taxonomy_view import show_skills_taxonomy_view
 
 def main():
     username, role, analyze = show_sidebar()
