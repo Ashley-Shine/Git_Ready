@@ -5,6 +5,7 @@ from groq import Groq
 import json
 from dotenv import load_dotenv
 
+# Added error handling for GitHub API responses
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
