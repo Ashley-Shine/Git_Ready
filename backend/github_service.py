@@ -13,7 +13,14 @@ HEADERS = {"Authorization": f"token {os.getenv('GITHUB_TOKEN')}"}
 def get_user_repos(username: str):
     url = f"https://api.github.com/users/{username}/repos"
     response = requests.get(url, headers=HEADERS, params={"per_page": 100})
-    return response.json()
+    #BELOW WAS NOT THERE
+    if response.status_code != 200:
+        return []
+    payload = response.json()
+    if isinstance(payload, list):
+        return payload
+    return []
+#TILL HERE
 def get_readme(username:str, repo_name: str):
     url = f"https://api.github.com/repos/{username}/{repo_name}/readme"
     response = requests.get(url, headers=HEADERS)
@@ -31,7 +38,13 @@ def fetch_github_profile(username: str):
     profile_data = []
     
     for repo in repos:
-        repo_name = repo["name"]
+       #BELOW WAS NOT THERE
+        if not isinstance(repo, dict):
+            continue
+        repo_name = repo.get("name")
+        if not repo_name:
+            continue
+       #TILL HERE
         profile_data.append({
             "name": repo_name,
             "readme_text": get_readme(username, repo_name),
