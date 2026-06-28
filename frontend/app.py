@@ -19,12 +19,12 @@ def main():
     if page == "Dashboard":
         show_dashboard(result)
     
-    #elif page == "Analytics":
-    #    show_analytics_view(result.get("analytics") if result else None)
-    #elif page == "Job Pipeline":
-    #    show_job_pipeline_view(result.get("job_data") if result else None)
-    #elif page == "Skills Taxonomy":
-    #    show_skills_taxonomy_view(result.get("taxonomy") if result else None)
+    elif page == "Analytics":
+        show_analytics_view(result.get("analytics") if result else None)
+    elif page == "Job Pipeline":
+        show_job_pipeline_view(result.get("job_data") if result else None)
+    elif page == "Skills Taxonomy":
+        show_skills_taxonomy_view(result.get("taxonomy") if result else None)
     
 if __name__ == "__main__":
     main()
