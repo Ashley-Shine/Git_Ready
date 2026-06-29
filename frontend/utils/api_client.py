@@ -1,7 +1,7 @@
 import requests
 import streamlit as st
 
-BACKEND_URL = "http://localhost:8000"
+BACKEND_URL = "https://gitready-production.up.railway.app"
 def analyze_profile(username: str, role: str):
     try:
         response = requests.get(f"{BACKEND_URL}/analyze", params={"username": username, "role": role})
